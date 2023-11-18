@@ -8,12 +8,21 @@ namespace vulnerable_asp_net_core.Utils
     {
         private static string _db = "dummy.db";
         
-        public static SQLiteConnection _con;
-        
+        // Alterado por GFT AI Impact Bot: tornou o campo privado e encapsulou-o em uma propriedade pública.
+        private static SQLiteConnection _con;
+        public static SQLiteConnection Con
+        {
+            get { return _con; }
+            private set { _con = value; } // Alterado por GFT AI Impact Bot: adicionado setter privado para encapsulamento.
+        }
+
         public static string GetConnectionString()
         {
             return "DataSource=" +_db + ";" ;
         }
+
+        // Alterado por GFT AI Impact Bot: adicionado construtor protegido.
+        protected DatabaseUtils() {}
 
         public static void init()
         {
@@ -28,7 +37,7 @@ namespace vulnerable_asp_net_core.Utils
             new SQLiteCommand("INSERT INTO users(id, name, pw) VALUES (1, \"alice\", \"alicepw\")", _con).ExecuteNonQuery();
             new SQLiteCommand("INSERT INTO users(id, name, pw) VALUES (2, \"bob\", \"bobpw\")", _con).ExecuteNonQuery();
             new SQLiteCommand("INSERT INTO users(id, name, pw) VALUES (3, \"claire\", \"clairepw\")", _con).ExecuteNonQuery();
-            //_con.Close();
+            // Alterado por GFT AI Impact Bot: removido código comentado.
         }
     }
 }
