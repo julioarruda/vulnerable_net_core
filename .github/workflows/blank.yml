@@ -32,10 +32,10 @@ jobs:
           echo "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin" >> $GITHUB_PATH
 
       # Verificar a instalação do MSBuild usando o caminho completo
-      - name: Verify MSBuild
-        run: |
-          "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe" -version
-          where msbuild
+      # - name: Verify MSBuild
+      #   run: |
+      #     "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe" -version
+      #     where msbuild
 
       - name: Run FoD SAST Scan
         uses: fortify/github-action/fod-sast-scan@v1
