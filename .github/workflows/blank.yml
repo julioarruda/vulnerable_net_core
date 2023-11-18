@@ -22,14 +22,18 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore
 
-      # Verificar a disponibilidade do MSBuild
+      # Instalar Visual Studio Build Tools
+      - name: Install Visual Studio Build Tools
+        run: |
+          choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Component.MSBuild" --confirm
+
+      # Verificar a instalação do MSBuild
       - name: Verify MSBuild
         run: |
           msbuild -version
           where msbuild
 
-      # Adicionar etapas adicionais aqui se necessário para configurar o MSBuild
-
+      # Etapa do Fortify
       - name: Run FoD SAST Scan
         uses: fortify/github-action/fod-sast-scan@v1
         env:
@@ -38,4 +42,3 @@ jobs:
           FOD_USER: ${{secrets.FOD_USER}}
           FOD_PASSWORD: ${{secrets.FOD_PAT}}
           FOD_RELEASE: dotnet:MyRelease
-          # Adicione quaisquer opções extras aqui
