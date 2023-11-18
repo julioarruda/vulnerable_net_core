@@ -1,19 +1,12 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
-# Controls when the workflow will run
 on:
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: windows-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:    
       - name: Check out source code
         uses: actions/checkout@v4  
@@ -29,6 +22,14 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore
 
+      # Verificar a disponibilidade do MSBuild
+      - name: Verify MSBuild
+        run: |
+          msbuild -version
+          where msbuild
+
+      # Adicionar etapas adicionais aqui se necessário para configurar o MSBuild
+
       - name: Run FoD SAST Scan
         uses: fortify/github-action/fod-sast-scan@v1
         env:
@@ -37,7 +38,4 @@ jobs:
           FOD_USER: ${{secrets.FOD_USER}}
           FOD_PASSWORD: ${{secrets.FOD_PAT}}
           FOD_RELEASE: dotnet:MyRelease
-          # EXTRA_FOD_LOGIN_OPTS: --socket-timeout=60s
-          # EXTRA_PACKAGE_OPTS: -oss
-          # DO_WAIT: true
-          # DO_EXPORT: true
+          # Adicione quaisquer opções extras aqui
