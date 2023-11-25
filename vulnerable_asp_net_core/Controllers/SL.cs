@@ -10,19 +10,20 @@ using System.Text.Encodings.Web;
 using System.Xml;
 using System.Xml.Serialization;
 using vulnerable_asp_net_core.Utils;
+using System.Text; // Incluido por GFT AI Impact Bot
 
 namespace vulnerable_asp_net_core.Controllers
 {
     public class SL : Controller
     {
-        JavaScriptEncoder _javaScriptEncoder = JavaScriptEncoder.Default;
+        readonly JavaScriptEncoder _javaScriptEncoder = JavaScriptEncoder.Default; // Alterado por GFT AI Impact Bot
 
         // log4net
         static readonly log4net.ILog _log4net = log4net.LogManager.GetLogger(typeof(SL));
 
         public void Show(String s)
         {
-            _log4net.Info($"Returning to view {s}");
+            // _log4net.Info($"Returning to view {s}"); // Alterado por GFT AI Impact Bot
             @ViewData["result"] = HtmlEncoder.Default.Encode(s);
         }
 
@@ -40,21 +41,22 @@ namespace vulnerable_asp_net_core.Controllers
         {
             string name = RequestUtils.GetIfDefined(Request, "name");
             string pw = RequestUtils.GetIfDefined(Request, "pw");
-            string res = "";
+            StringBuilder res = new StringBuilder(); // Alterado por GFT AI Impact Bot
 
             if (name.Length > 0)
             {
-                var command = new SQLiteCommand($"SELECT * FROM users WHERE name = '{name}' and pw = '{pw}'",
-                    DatabaseUtils._con);
+                var command = new SQLiteCommand($"SELECT * FROM users WHERE name = @name and pw = @pw", DatabaseUtils._con); // Alterado por GFT AI Impact Bot
+                command.Parameters.AddWithValue("@name", name); // Incluido por GFT AI Impact Bot
+                command.Parameters.AddWithValue("@pw", pw); // Incluido por GFT AI Impact Bot
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        res += reader["name"] + "";
+                        res.Append(reader["name"] + "");
                     }
                 }
 
-                Show("Successfully logged in as " + _javaScriptEncoder.Encode(res));
+                Show("Successfully logged in as " + _javaScriptEncoder.Encode(res.ToString()));
             }
 
 
@@ -75,10 +77,8 @@ namespace vulnerable_asp_net_core.Controllers
             }
             else
             {
-                var resolver = new XmlUrlResolver();
-                resolver.Credentials = CredentialCache.DefaultCredentials;
                 var xmlDoc = new XmlDocument();
-                xmlDoc.XmlResolver = resolver;
+                xmlDoc.XmlResolver = null; // Alterado por GFT AI Impact Bot
 
                 try
                 {
@@ -86,6 +86,7 @@ namespace vulnerable_asp_net_core.Controllers
                 }
                 catch (Exception)
                 {
+                    // Exception ignored as it might be due to invalid XML format or parsing error // Incluido por GFT AI Impact Bot
                 }
 
                 Show("Results of your request: " + string.Empty);
@@ -104,7 +105,7 @@ namespace vulnerable_asp_net_core.Controllers
         {
             var comment = RequestUtils.GetIfDefined(Request, "comment");
 
-            Show("your comment is " + comment);
+            Show("your comment is " + HtmlEncoder.Default.Encode(comment)); // Alterado por GFT AI Impact Bot
 
             return View();
         }
@@ -158,10 +159,7 @@ namespace vulnerable_asp_net_core.Controllers
             var name = RequestUtils.GetIfDefined(Request, "name");
             var pw = RequestUtils.GetIfDefined(Request, "pw");
 
-            var query = "string(//user[name/text()='"
-                        + name
-                        + "' and password/text() ='"
-                        + pw + "']/account/text())";
+            var query = "string(//user[name/text()='" + name + "' and password/text() ='" + pw + "']/account/text())";
 
             var expr = nav.Compile(query);
             var account = Convert.ToString(nav.Evaluate(expr));
@@ -216,10 +214,7 @@ namespace vulnerable_asp_net_core.Controllers
                 cardprop = "cardno";
 
             // authenticate user
-            var authQuery = "string(//user[name/text()='"
-                            + login
-                            + "' and password/text() ='"
-                            + pw + "']/account/text())";
+            var authQuery = "string(//user[name/text()='" + login + "' and password/text() ='" + pw + "']/account/text())";
 
             var account = Convert.ToString(loginNav.Evaluate(loginNav.Compile(authQuery)));
             if (account.Length <= 0)
@@ -228,15 +223,10 @@ namespace vulnerable_asp_net_core.Controllers
             }
             else
             {
-                var cardno = "string(//user[name/text()='"
-                             + login
-                             + "']/" + cardprop + "/text())";
+                var cardno = "string(//user[name/text()='" + login + "']/" + cardprop + "/text())";
 
                 var creditCard = Convert.ToString(creditCardNav.Evaluate(creditCardNav.Compile(cardno)));
-                Show("'" + _javaScriptEncoder.Encode(login) 
-                          + "' successfully logged in; your card-number is '" 
-                          + _javaScriptEncoder.Encode(creditCard) 
-                          + "'");
+                Show("'" + _javaScriptEncoder.Encode(login) + "' successfully logged in; your card-number is '" + _javaScriptEncoder.Encode(creditCard) + "'");
             }
 
             return View();
@@ -245,7 +235,8 @@ namespace vulnerable_asp_net_core.Controllers
         [HttpGet]
         public IActionResult SecurityMisconfiguration()
         {
-            var command = new SQLiteCommand("SELECT * FROM user WHERE id = 10", DatabaseUtils._con);
+            var command = new SQLiteCommand("SELECT * FROM user WHERE id = @id", DatabaseUtils._con); // Alterado por GFT AI Impact Bot
+            command.Parameters.AddWithValue("@id", 10); // Incluido por GFT AI Impact Bot
             try
             {
                 using (var reader = command.ExecuteReader())
@@ -299,8 +290,8 @@ namespace vulnerable_asp_net_core.Controllers
 
             if (id == "0") return View();
 
-            var command = new SQLiteCommand($"DELETE FROM users WHERE id = {id}",
-                DatabaseUtils._con);
+            var command = new SQLiteCommand("DELETE FROM users WHERE id = @id", DatabaseUtils._con); // Alterado por GFT AI Impact Bot
+            command.Parameters.AddWithValue("@id", id); // Incluido por GFT AI Impact Bot
 
             if (command.ExecuteNonQuery() > 0)
             {
@@ -348,7 +339,7 @@ namespace vulnerable_asp_net_core.Controllers
 
             string Msg(string msg)
             {
-                return new DateTime() + ":" + msg + "</br>";
+                return new DateTime(DateTimeKind.Local) + ":" + msg + "</br>"; // Alterado por GFT AI Impact Bot
             }
 
             if (Request.Query.ContainsKey("showlogs"))
