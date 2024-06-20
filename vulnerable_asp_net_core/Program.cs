@@ -12,6 +12,9 @@ namespace vulnerable_asp_net_core
 {
 	public class Program
 	{
+		// Incluido por GFT AI Impact Bot
+		protected Program() {}
+
 		public static void Main(string[] args)
 		{
 			CreateWebHostBuilder(args).Build().Run();
